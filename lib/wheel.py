@@ -1,3 +1,5 @@
+import RPi.GPIO as GPIO
+
 class Wheel:
     PINS = {
         'left': { 'pwm': 13, 'primary': 11, 'secondry': 15 },
@@ -5,38 +7,43 @@ class Wheel:
     }
 
     def __init__(self, options = {}):
-        self.side = options['side']
-
-        pins = self.PINS[options['side']]
+        # self.side = options['side']
+        self.pins = self.PINS[options['side']]
 
         if not pins:
             # TODO!!!!
             raise ValueError("'side' option is required. Valid values: ['left', 'right']")
 
-        # TODO!!!!
-        # self.pwm = PiPiper::Pwm.new pin: pins[:pwm]
-        # self.primary = PiPiper::Pin.new pin: pins[:primary], direction: :out
-        # self.@secondry = PiPiper::Pin.new pin: pins[:secondry], direction: :out
+        # Numbers GPIOs by physical location
+        GPIO.setmode(GPIO.BOARD)
+
+        GPIO.setup(self.pins['pwm'], GPIO.OUT)
+        GPIO.setup(self.pins['primary'], GPIO.OUT)
+        GPIO.setup(self.pins['secondry'], GPIO.OUT)
+
+        GPIO.output(self.pins['pwm'], GPIO.HIGH)
+        GPIO.output(self.pins['primary'], GPIO.LOW)
+        GPIO.output(self.pins['secondry'], GPIO.LOW)
+
+        # set Frequece to 500 Hz
+        self.pwm = GPIO.PWM(self.pins['pwm'], 500)
+        self.pwm.start(0)
 
     def stop(self):
-        print self.side + ': STOP'
-        #all_off
+        # print self.side + ': STOP'
+        self.pwm.ChangeDutyCycle(0)
+        GPIO.output(self.pins['primary'], GPIO.LOW)
+        GPIO.output(self.pins['secondry'], GPIO.LOW)
 
     def set_level(self, level):
-        print self.side + ': SET LVL: ' + str(level)
-        # self.pwm.on
-        # self.pwm.value = (level / 100)
+        # print self.side + ': SET LVL: ' + str(level)
+        self.pwm.ChangeDutyCycle(level)
 
     def set_rotation(self, reverse):
-        print self.side + ': ROTATION: ' + ('RV' if reverse else 'ST')
-    #     if reverse:
-    #         self.primary.off
-    #         self.secondry.on
-    #     else:
-    #         self.primary.on
-    #         self.secondry.off
-    #
-    # def all_off(self):
-    #     @pwm.off
-    #     @primary.off
-    #     @secondry.off
+        # print self.side + ': ROTATION: ' + ('RV' if reverse else 'ST')
+        if reverse:
+            GPIO.output(self.pins['primary'], GPIO.LOW)
+            GPIO.output(self.pins['secondry'], GPIO.HIGH)
+        else:
+            GPIO.output(self.pins['primary'], GPIO.HIGH)
+            GPIO.output(self.pins['secondry'], GPIO.LOW)
