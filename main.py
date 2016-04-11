@@ -5,8 +5,6 @@ import yaml
 import threading
 import json
 
-#require 'vehicle'
-
 CAR_NAME = 'carName'
 
 class Listener(threading.Thread):

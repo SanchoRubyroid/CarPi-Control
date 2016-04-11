@@ -40,8 +40,3 @@ class Wheel:
     #     @pwm.off
     #     @primary.off
     #     @secondry.off
-    #
-    # def shutdown(self):
-    #     @pwm.close
-    #     @primary.close
-    #     @secondry.close

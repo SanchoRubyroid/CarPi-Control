@@ -30,43 +30,61 @@ class Vehicle:
         self.left_wheel = Wheel({'side': 'left'})
         self.right_wheel = Wheel({'side': 'right'})
 
-    def shutdown(self):
-        self.left_wheel.shutdown
-        self.right_wheel.shutdown
-
     def update(self, data):
+        self.update_vehicle_state_values(data)
+
+        if self.torque_level() == 0:
+            self.stop_vehicle()
+        else:
+            self.update_wheels_torque()
+            self.update_wheels_rotation()
+
+    def stop_vehicle(self):
+        self.left_wheel.stop()
+        self.right_wheel.stop()
+
+    def calculate_torque_level_turning_side(self):
+        delta_percent = ((self.torque_level() * self.direction_level()) / 100)
+        return self.torque_level() - delta_percent
+
+    def update_vehicle_state_values(self, data):
         self.vehicle_state[self.TORQUE_LEVEL] = float(data[self.EXTERNAL_MAPPING[self.TORQUE_LEVEL]])
         self.vehicle_state[self.REVERSE] = data[self.EXTERNAL_MAPPING[self.REVERSE]]
         self.vehicle_state[self.DIRECTION_LEVEL] = float(data[self.EXTERNAL_MAPPING[self.DIRECTION_LEVEL]])
         self.vehicle_state[self.DIRECTION] = int(data[self.EXTERNAL_MAPPING[self.DIRECTION]])
 
-        if self.vehicle_state[self.TORQUE_LEVEL] == 0:
-            self.left_wheel.stop()
-            self.right_wheel.stop()
-            return
-
+    def update_wheels_torque(self):
         if self.is_turning():
             torque_level_turning_side = self.calculate_torque_level_turning_side()
 
-        if self.vehicle_state[self.DIRECTION] == self.LEFT:
+        if self.direction() == self.LEFT:
             self.left_wheel.set_level(torque_level_turning_side)
-            self.right_wheel.set_level(self.vehicle_state[self.TORQUE_LEVEL])
-        elif self.vehicle_state[self.DIRECTION] == self.RIGHT:
-            self.left_wheel.set_level(self.vehicle_state[self.TORQUE_LEVEL])
+            self.right_wheel.set_level(self.torque_level())
+        elif self.direction() == self.RIGHT:
+            self.left_wheel.set_level(self.torque_level())
             self.right_wheel.set_level(torque_level_turning_side)
         else:
-            self.left_wheel.set_level(self.vehicle_state[self.TORQUE_LEVEL])
-            self.right_wheel.set_level(self.vehicle_state[self.TORQUE_LEVEL])
+            self.left_wheel.set_level(self.torque_level())
+            self.right_wheel.set_level(self.torque_level())
 
-        self.left_wheel.set_rotation(self.vehicle_state[self.REVERSE])
-        self.right_wheel.set_rotation(self.vehicle_state[self.REVERSE])
-
-    def calculate_torque_level_turning_side(self):
-        delta_percent = ((self.vehicle_state[self.TORQUE_LEVEL] * self.vehicle_state[self.DIRECTION_LEVEL]) / 100)
-        return self.vehicle_state[self.TORQUE_LEVEL] - delta_percent
+    def update_wheels_rotation(self):
+        self.left_wheel.set_rotation(self.reverse())
+        self.right_wheel.set_rotation(self.reverse())
 
     def is_turning(self):
         return self.vehicle_state[self.DIRECTION] in [self.LEFT, self.RIGHT]
 
-    # def to_s
-    #     @vehicle_state.map {|key, value| "#{key}: #{value}" }.join('; ')
+    def torque_level(self):
+        return self.get_state_value(self.TORQUE_LEVEL)
+
+    def reverse(self):
+        return self.get_state_value(self.REVERSE)
+
+    def direction_level(self):
+        return self.get_state_value(self.DIRECTION_LEVEL)
+
+    def direction(self):
+        return self.get_state_value(self.DIRECTION)
+
+    def get_state_value(self, key):
+        return self.vehicle_state[key]
