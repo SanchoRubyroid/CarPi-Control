@@ -10,7 +10,7 @@ class Wheel:
     PWM_FQ = 500
 
     @classmethod
-    def cleanup():
+    def cleanup(cls):
         GPIO.cleanup()
 
     def __init__(self, options = {}):
