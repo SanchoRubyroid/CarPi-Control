@@ -2,7 +2,6 @@ from lib.vehicle import Vehicle
 
 import redis
 import yaml
-import threading
 import json
 
 CAR_NAME = 'shelby-gt100500'
