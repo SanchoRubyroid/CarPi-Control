@@ -44,8 +44,8 @@ class Vehicle:
         self.right_wheel.stop()
 
     def shutdown(self):
-        self.left_wheel.shutdown()
-        self.right_wheel.shutdown()
+        self.stop_vehicle()
+        Wheel.cleanup()
 
     def calculate_torque_level_turning_side(self):
         delta_percent = ((self.torque_level() * self.direction_level()) / 100)

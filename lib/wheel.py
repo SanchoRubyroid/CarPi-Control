@@ -9,6 +9,10 @@ class Wheel:
     # PWM Frequece
     PWM_FQ = 500
 
+    @classmethod
+    def cleanup():
+        GPIO.cleanup()
+
     def __init__(self, options = {}):
         # self.side = options['side']
         self.pins = self.PINS[options['side']]
@@ -30,10 +34,6 @@ class Wheel:
 
         self.pwm = GPIO.PWM(self.pins['pwm'], self.PWM_FQ)
         self.pwm.start(0)
-
-    def shutdown(self):
-        self.stop()
-        GPIO.cleanup()
 
     def stop(self):
         # print self.side + ': STOP'
