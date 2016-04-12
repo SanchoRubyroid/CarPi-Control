@@ -24,6 +24,7 @@ class Listener(threading.Thread):
         for item in self.pubsub.listen():
             if item['data'] == 'KILL':
                 self.pubsub.unsubscribe()
+                self.vehicle.shutdown()
                 print self, 'unsubscribed and finished'
                 break
             elif isinstance(item['data'], str):

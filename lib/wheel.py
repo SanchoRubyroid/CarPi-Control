@@ -6,11 +6,14 @@ class Wheel:
         'right': { 'pwm': 12, 'primary': 16, 'secondry': 18 }
     }
 
+    # PWM Frequece
+    PWM_FQ = 500
+
     def __init__(self, options = {}):
         # self.side = options['side']
         self.pins = self.PINS[options['side']]
 
-        if not pins:
+        if not self.pins:
             # TODO!!!!
             raise ValueError("'side' option is required. Valid values: ['left', 'right']")
 
@@ -25,9 +28,12 @@ class Wheel:
         GPIO.output(self.pins['primary'], GPIO.LOW)
         GPIO.output(self.pins['secondry'], GPIO.LOW)
 
-        # set Frequece to 500 Hz
-        self.pwm = GPIO.PWM(self.pins['pwm'], 500)
+        self.pwm = GPIO.PWM(self.pins['pwm'], self.PWM_FQ)
         self.pwm.start(0)
+
+    def shutdown(self):
+        self.stop()
+        GPIO.cleanup()
 
     def stop(self):
         # print self.side + ': STOP'
