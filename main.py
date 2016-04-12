@@ -10,11 +10,20 @@ CAR_NAME = 'carName'
 class Listener:
     def __init__(self, name):
         self.vehicle = Vehicle(name)
+        self.initialize_redis()
 
+    def initialize_redis(self):
         redis_config = yaml.safe_load(open('redis-conf.yml'))
-        print redis_config
+        redis_config.setdefault('password', None)
 
-        self.redis = redis.Redis(host=redis_config['host'], port=redis_config['port'])
+        self.redis = redis.Redis(
+            host=redis_config['host'],
+            port=redis_config['port'],
+            password=redis_config['password'])
+
+        self.redis.setex('carOnline', '', 1)
+        self.redis.execute_command('client', 'setname', self.vehicle.name)
+
         self.pubsub = self.redis.pubsub()
         self.pubsub.subscribe(self.vehicle.name)
 
