@@ -1,4 +1,7 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    print 'ERROR: RPi.GPIO import failed. DEBUG_MODE only.'
 
 class Wheel:
     PINS = {
@@ -14,12 +17,10 @@ class Wheel:
         GPIO.cleanup()
 
     def __init__(self, options = {}):
-        # self.side = options['side']
-        self.pins = self.PINS[options['side']]
-
-        if not self.pins:
-            # TODO!!!!
-            raise ValueError("'side' option is required. Valid values: ['left', 'right']")
+        try:
+            self.pins = self.PINS[options['side']]
+        except KeyError:
+            raise ValueError("'side' option is required. Valid values: " + str(self.PINS.keys()))
 
         # Numbers GPIOs by physical location
         GPIO.setmode(GPIO.BOARD)
@@ -36,20 +37,37 @@ class Wheel:
         self.pwm.start(0)
 
     def stop(self):
-        # print self.side + ': STOP'
         self.pwm.ChangeDutyCycle(0)
         GPIO.output(self.pins['primary'], GPIO.LOW)
         GPIO.output(self.pins['secondry'], GPIO.LOW)
 
     def set_level(self, level):
-        # print self.side + ': SET LVL: ' + str(level)
         self.pwm.ChangeDutyCycle(level)
 
     def set_rotation(self, reverse):
-        # print self.side + ': ROTATION: ' + ('RV' if reverse else 'ST')
         if reverse:
             GPIO.output(self.pins['primary'], GPIO.LOW)
             GPIO.output(self.pins['secondry'], GPIO.HIGH)
         else:
             GPIO.output(self.pins['primary'], GPIO.HIGH)
             GPIO.output(self.pins['secondry'], GPIO.LOW)
+
+class DebugWheel:
+    @classmethod
+    def cleanup(cls):
+        print '[WHEEL] CLEANUP'
+
+    def __init__(self, options = {}):
+        self.side = options['side'].upper().ljust(5)
+
+    def stop(self):
+        self.say('STOPPED')
+
+    def set_level(self, level):
+        self.say('TQ: ' + str(level))
+
+    def set_rotation(self, reverse):
+        self.say('RT: ' + str(reverse))
+
+    def say(self, message):
+        print '[' + self.side + '] ' + message

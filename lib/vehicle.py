@@ -1,6 +1,8 @@
-from wheel import Wheel
+from wheel import Wheel, DebugWheel
 
 class Vehicle:
+    DEBUG_MODE = False
+
     STRAIGHT = 0
     LEFT = -1
     RIGHT = 1
@@ -27,8 +29,10 @@ class Vehicle:
 
         self.vehicle_state = initial_vehicle_state
 
-        self.left_wheel = Wheel({'side': 'left'})
-        self.right_wheel = Wheel({'side': 'right'})
+        the_wheel_klass = (DebugWheel if self.DEBUG_MODE else Wheel)
+
+        self.left_wheel = the_wheel_klass({'side': 'left'})
+        self.right_wheel = the_wheel_klass({'side': 'right'})
 
     def update(self, data):
         self.update_vehicle_state_values(data)
@@ -45,7 +49,7 @@ class Vehicle:
 
     def shutdown(self):
         self.stop_vehicle()
-        Wheel.cleanup()
+        (DebugWheel if self.DEBUG_MODE else Wheel).cleanup()
 
     def calculate_torque_level_turning_side(self):
         delta_percent = ((self.torque_level() * self.direction_level()) / 100)
