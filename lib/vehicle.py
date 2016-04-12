@@ -74,7 +74,7 @@ class Vehicle:
     def update_wheels_rotation(self):
         self.left_wheel.set_rotation(self.reverse())
         self.right_wheel.set_rotation(self.reverse())
-        
+
     def calculate_torque_level_turning_side(self):
         delta_percent = ((self.torque_level() * self.direction_level()) / 100)
         return self.torque_level() - delta_percent

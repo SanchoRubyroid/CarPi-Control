@@ -7,7 +7,7 @@ import json
 
 CAR_NAME = 'carName'
 
-class Manager:
+class Listener:
     def __init__(self, name):
         self.vehicle = Vehicle(name)
 
@@ -18,7 +18,7 @@ class Manager:
         self.pubsub = self.redis.pubsub()
         self.pubsub.subscribe(self.vehicle.name)
 
-    def execute(self):
+    def listen(self):
         for item in self.pubsub.listen():
             if item['data'] == 'KILL':
                 self.shutdown()
@@ -38,7 +38,7 @@ class Manager:
 
 if __name__ == "__main__":
     try:
-        manager = Manager(CAR_NAME)
-        manager.execute()
+        listener = Listener(CAR_NAME)
+        listener.listen()
     except KeyboardInterrupt:
-        manager.shutdown()
+        listener.shutdown()
