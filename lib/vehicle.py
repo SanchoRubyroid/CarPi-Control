@@ -51,10 +51,6 @@ class Vehicle:
         self.stop_vehicle()
         (DebugWheel if self.DEBUG_MODE else Wheel).cleanup()
 
-    def calculate_torque_level_turning_side(self):
-        delta_percent = ((self.torque_level() * self.direction_level()) / 100)
-        return self.torque_level() - delta_percent
-
     def update_vehicle_state_values(self, data):
         self.vehicle_state[self.TORQUE_LEVEL] = float(data[self.EXTERNAL_MAPPING[self.TORQUE_LEVEL]])
         self.vehicle_state[self.REVERSE] = data[self.EXTERNAL_MAPPING[self.REVERSE]]
@@ -78,9 +74,13 @@ class Vehicle:
     def update_wheels_rotation(self):
         self.left_wheel.set_rotation(self.reverse())
         self.right_wheel.set_rotation(self.reverse())
+        
+    def calculate_torque_level_turning_side(self):
+        delta_percent = ((self.torque_level() * self.direction_level()) / 100)
+        return self.torque_level() - delta_percent
 
     def is_turning(self):
-        return self.vehicle_state[self.DIRECTION] in [self.LEFT, self.RIGHT]
+        return self.direction() in [self.LEFT, self.RIGHT]
 
     def torque_level(self):
         return self.get_state_value(self.TORQUE_LEVEL)
