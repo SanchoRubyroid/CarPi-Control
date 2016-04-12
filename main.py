@@ -7,8 +7,8 @@ import json
 CAR_NAME = 'shelby-gt100500'
 
 class Listener:
-    def __init__(self, name):
-        self.vehicle = Vehicle(name)
+    def __init__(self):
+        self.vehicle = Vehicle(CAR_NAME)
         self.initialize_redis()
 
     def initialize_redis(self):
@@ -46,7 +46,7 @@ class Listener:
 
 if __name__ == "__main__":
     try:
-        listener = Listener(CAR_NAME)
+        listener = Listener()
         listener.listen()
     except KeyboardInterrupt:
         listener.shutdown()
