@@ -5,7 +5,7 @@ import yaml
 import threading
 import json
 
-CAR_NAME = 'carName'
+CAR_NAME = 'shelby-gt100500'
 
 class Listener:
     def __init__(self, name):
@@ -21,8 +21,8 @@ class Listener:
             port=redis_config['port'],
             password=redis_config['password'])
 
-        self.redis.setex('carOnline', '', 1)
-        self.redis.execute_command('client', 'setname', self.vehicle.name)
+        self.redis.setex('car-online', '', 1)
+        self.redis.execute_command('client', 'setname', '__vehicle__' + self.vehicle.name)
 
         self.pubsub = self.redis.pubsub()
         self.pubsub.subscribe(self.vehicle.name)
