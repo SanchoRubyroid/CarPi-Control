@@ -20,7 +20,7 @@ class Listener:
             port=redis_config['port'],
             password=redis_config['password'])
 
-        self.redis.setex('car-online', '', 1)
+        self.redis.setex('cars-list-refresh', '', 1)
         self.redis.execute_command('client', 'setname', '__vehicle__' + self.vehicle.name)
 
         self.pubsub = self.redis.pubsub()
@@ -42,6 +42,7 @@ class Listener:
     def shutdown(self):
         self.pubsub.unsubscribe()
         self.vehicle.shutdown()
+        self.redis.setex('cars-list-refresh', '', 1)
         print 'unsubscribed and finished'
 
 if __name__ == "__main__":
