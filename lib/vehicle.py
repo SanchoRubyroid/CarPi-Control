@@ -1,8 +1,6 @@
 from wheel import Wheel, DebugWheel
 
 class Vehicle:
-    DEBUG_MODE = False
-
     STRAIGHT = 0
     LEFT = -1
     RIGHT = 1
@@ -19,17 +17,19 @@ class Vehicle:
         DIRECTION: 'direction'
     }
 
-    def __init__(self, name, initial_vehicle_state = {}):
-        self.name = name
+    def __init__(self, options, initial_vehicle_state = {}):
+        self.name = options['vehicle_name']
 
         initial_vehicle_state.setdefault(self.TORQUE_LEVEL, 0)
         initial_vehicle_state.setdefault(self.REVERSE, False)
         initial_vehicle_state.setdefault(self.DIRECTION_LEVEL, 0)
         initial_vehicle_state.setdefault(self.DIRECTION, self.STRAIGHT)
-
         self.vehicle_state = initial_vehicle_state
 
-        the_wheel_klass = (DebugWheel if self.DEBUG_MODE else Wheel)
+        options.setdefault('debug_mode', False)
+        self.options = options
+
+        the_wheel_klass = (DebugWheel if self.options['debug_mode'] else Wheel)
 
         self.left_wheel = the_wheel_klass({'side': 'left'})
         self.right_wheel = the_wheel_klass({'side': 'right'})
@@ -49,7 +49,7 @@ class Vehicle:
 
     def shutdown(self):
         self.stop_vehicle()
-        (DebugWheel if self.DEBUG_MODE else Wheel).cleanup()
+        (DebugWheel if self.options['debug_mode'] else Wheel).cleanup()
 
     def update_vehicle_state_values(self, data):
         self.vehicle_state[self.TORQUE_LEVEL] = float(data[self.EXTERNAL_MAPPING[self.TORQUE_LEVEL]])

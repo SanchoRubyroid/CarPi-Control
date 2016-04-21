@@ -4,11 +4,11 @@ import redis
 import yaml
 import json
 
-CAR_NAME = 'shelby-gt100500'
-
 class Listener:
     def __init__(self):
-        self.vehicle = Vehicle(CAR_NAME)
+        config = yaml.safe_load(open('config.yml'))
+
+        self.vehicle = Vehicle(config)
         self.initialize_redis()
 
     def initialize_redis(self):
