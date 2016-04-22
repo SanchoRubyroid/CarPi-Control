@@ -1,2 +1,4 @@
-debug_mode: true
+debug_mode: false
 vehicle_name: 'shelby-gt100500'
+host: 127.0.0.1
+port: 1337
