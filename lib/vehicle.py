@@ -5,17 +5,18 @@ class Vehicle:
     LEFT = -1
     RIGHT = 1
 
+    TORQUE_LEVEL_INDEX = 0
+    DIRECTION_LEVEL_INDEX = 1
+    STATUS_INDEX = 2
+
+    REVERSE_MASK = 0b00000100
+    DIRECTION_RIGHT_MASK = 0b00000001
+    DIRECTION_LEFT_MASK = 0b00000010
+
     TORQUE_LEVEL = 'torque_level'
     REVERSE = 'reverse'
     DIRECTION_LEVEL = 'direction_level'
     DIRECTION = 'direction'
-
-    EXTERNAL_MAPPING = {
-        TORQUE_LEVEL: 'torqueLevel',
-        REVERSE: 'torqueReversed',
-        DIRECTION_LEVEL: 'directionLevel',
-        DIRECTION: 'direction'
-    }
 
     def __init__(self, options, initial_vehicle_state = {}):
         self.name = options['vehicle_name']
@@ -52,10 +53,23 @@ class Vehicle:
         (DebugWheel if self.options['debug_mode'] else Wheel).cleanup()
 
     def update_vehicle_state_values(self, data):
-        self.vehicle_state[self.TORQUE_LEVEL] = float(data[self.EXTERNAL_MAPPING[self.TORQUE_LEVEL]])
-        self.vehicle_state[self.REVERSE] = data[self.EXTERNAL_MAPPING[self.REVERSE]]
-        self.vehicle_state[self.DIRECTION_LEVEL] = float(data[self.EXTERNAL_MAPPING[self.DIRECTION_LEVEL]])
-        self.vehicle_state[self.DIRECTION] = int(data[self.EXTERNAL_MAPPING[self.DIRECTION]])
+        self.vehicle_state[self.TORQUE_LEVEL] = data[self.TORQUE_LEVEL_INDEX]
+        self.vehicle_state[self.REVERSE] = self.get_from_status(data[self.STATUS_INDEX], 'reverse')
+        self.vehicle_state[self.DIRECTION_LEVEL] = data[self.DIRECTION_LEVEL_INDEX]
+        self.vehicle_state[self.DIRECTION] = self.get_from_status(data[self.STATUS_INDEX], 'direction')
+
+    def get_from_status(self, status_bits, status_type):
+        if status_type == 'reverse':
+            return ((status_bits & self.REVERSE_MASK) > 0)
+        elif status_type == 'direction':
+            if ((status_bits & self.DIRECTION_RIGHT_MASK) > 0):
+                return self.RIGHT
+            elif ((status_bits & self.DIRECTION_LEFT_MASK) > 0):
+                return self.LEFT
+            else:
+                return self.STRAIGHT
+        else:
+            return 'Bad type'
 
     def update_wheels_torque(self):
         if self.is_turning():
