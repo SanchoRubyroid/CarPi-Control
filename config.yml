@@ -3,3 +3,6 @@ vehicle_name: 'shelby-gt100500'
 host: '159.203.81.18'
 port: 1337
 steering_strategy: 'tank'
+accessories:
+  - global-enable
+  - lights

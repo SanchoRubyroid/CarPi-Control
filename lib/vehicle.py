@@ -1,6 +1,7 @@
 from wheel import Wheel, DebugWheel
-from status_bits import StatusBits
+from accessory import Accessory, DebugAccessory
 from steering import Steering
+from status_bits import StatusBits
 
 class Vehicle:
     TORQUE_LEVEL_INDEX = 0
@@ -12,24 +13,29 @@ class Vehicle:
     DIRECTION_LEVEL = 'direction_level'
     DIRECTION = 'direction'
 
-    def __init__(self, options, initial_vehicle_state = {}):
+    def __init__(self, options):
+        options.setdefault('debug_mode', False)
+
         self.name = options['vehicle_name']
+        self.debug_mode = options['debug_mode']
 
         self.steering = Steering.get(options['steering_strategy'])
 
-        initial_vehicle_state.setdefault(self.TORQUE_LEVEL, 0)
-        initial_vehicle_state.setdefault(self.REVERSE, False)
-        initial_vehicle_state.setdefault(self.DIRECTION_LEVEL, 0)
-        initial_vehicle_state.setdefault(self.DIRECTION, self.steering.STRAIGHT)
-        self.vehicle_state = initial_vehicle_state
-
-        options.setdefault('debug_mode', False)
-        self.options = options
-
-        the_wheel_klass = (DebugWheel if self.options['debug_mode'] else Wheel)
-
+        the_wheel_klass = (DebugWheel if self.debug_mode else Wheel)
         self.left_wheel = the_wheel_klass({'side': 'left'})
         self.right_wheel = the_wheel_klass({'side': 'right'})
+
+        initial_vehicle_state = {
+            self.TORQUE_LEVEL: 0,
+            self.REVERSE: False,
+            self.DIRECTION_LEVEL: 0,
+            self.DIRECTION: self.steering.STRAIGHT
+        }
+        self.vehicle_state = initial_vehicle_state
+
+        the_accessory_klass = (DebugAccessory if self.debug_mode else Accessory)
+        self.accessory = the_accessory_klass(options['accessories'])
+        self.accessory.enable(Accessory.GLOBAL_ENABLE)
 
     def update(self, data):
         self.update_vehicle_state_values(data)
@@ -47,7 +53,8 @@ class Vehicle:
 
     def shutdown(self):
         self.stop_vehicle()
-        (DebugWheel if self.options['debug_mode'] else Wheel).cleanup()
+        self.accessory.disable(Accessory.GLOBAL_ENABLE)
+        (DebugWheel if self.debug_mode else Wheel).cleanup()
 
     def update_vehicle_state_values(self, data):
         status_bits = StatusBits(data[self.STATUS_INDEX])
