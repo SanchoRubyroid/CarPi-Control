@@ -1,11 +1,8 @@
 from wheel import Wheel, DebugWheel
 from status_bits import StatusBits
+from steering import Steering
 
 class Vehicle:
-    STRAIGHT = 0
-    LEFT = -1
-    RIGHT = 1
-
     TORQUE_LEVEL_INDEX = 0
     DIRECTION_LEVEL_INDEX = 1
     STATUS_INDEX = 2
@@ -18,10 +15,12 @@ class Vehicle:
     def __init__(self, options, initial_vehicle_state = {}):
         self.name = options['vehicle_name']
 
+        self.steering = Steering.get(options['steering_strategy'])
+
         initial_vehicle_state.setdefault(self.TORQUE_LEVEL, 0)
         initial_vehicle_state.setdefault(self.REVERSE, False)
         initial_vehicle_state.setdefault(self.DIRECTION_LEVEL, 0)
-        initial_vehicle_state.setdefault(self.DIRECTION, self.STRAIGHT)
+        initial_vehicle_state.setdefault(self.DIRECTION, self.steering.STRAIGHT)
         self.vehicle_state = initial_vehicle_state
 
         options.setdefault('debug_mode', False)
@@ -40,6 +39,7 @@ class Vehicle:
         else:
             self.update_wheels_torque()
             self.update_wheels_rotation()
+            self.update_steering()
 
     def stop_vehicle(self):
         self.left_wheel.stop()
@@ -57,20 +57,20 @@ class Vehicle:
         self.vehicle_state[self.DIRECTION_LEVEL] = data[self.DIRECTION_LEVEL_INDEX]
 
         if status_bits.direction_right():
-            self.vehicle_state[self.DIRECTION] = self.RIGHT
+            self.vehicle_state[self.DIRECTION] = self.steering.RIGHT
         elif status_bits.direction_left():
-            self.vehicle_state[self.DIRECTION] = self.LEFT
+            self.vehicle_state[self.DIRECTION] = self.steering.LEFT
         else:
-            self.vehicle_state[self.DIRECTION] = self.STRAIGHT
+            self.vehicle_state[self.DIRECTION] = self.steering.STRAIGHT
 
     def update_wheels_torque(self):
         if self.is_turning():
-            torque_level_turning_side = self.calculate_torque_level_turning_side()
+            torque_level_turning_side = self.steering.calculate_torque_level_turning_side(self.torque_level(), self.direction_level())
 
-        if self.direction() == self.LEFT:
+        if self.direction() == self.steering.LEFT:
             self.left_wheel.set_level(torque_level_turning_side)
             self.right_wheel.set_level(self.torque_level())
-        elif self.direction() == self.RIGHT:
+        elif self.direction() == self.steering.RIGHT:
             self.left_wheel.set_level(self.torque_level())
             self.right_wheel.set_level(torque_level_turning_side)
         else:
@@ -81,12 +81,11 @@ class Vehicle:
         self.left_wheel.set_rotation(self.reverse())
         self.right_wheel.set_rotation(self.reverse())
 
-    def calculate_torque_level_turning_side(self):
-        delta_percent = ((self.torque_level() * self.direction_level()) / 100)
-        return self.torque_level() - delta_percent
+    def update_steering(self):
+        self.steering.update(self.direction_level(), self.direction())
 
     def is_turning(self):
-        return self.direction() in [self.LEFT, self.RIGHT]
+        return self.direction() in [self.steering.LEFT, self.steering.RIGHT]
 
     def torque_level(self):
         return self.get_state_value(self.TORQUE_LEVEL)
