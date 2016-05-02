@@ -1,4 +1,5 @@
 from wheel import Wheel, DebugWheel
+from status_bits import StatusBits
 
 class Vehicle:
     STRAIGHT = 0
@@ -8,10 +9,6 @@ class Vehicle:
     TORQUE_LEVEL_INDEX = 0
     DIRECTION_LEVEL_INDEX = 1
     STATUS_INDEX = 2
-
-    REVERSE_MASK = 0b00000100
-    DIRECTION_RIGHT_MASK = 0b00000001
-    DIRECTION_LEFT_MASK = 0b00000010
 
     TORQUE_LEVEL = 'torque_level'
     REVERSE = 'reverse'
@@ -53,23 +50,18 @@ class Vehicle:
         (DebugWheel if self.options['debug_mode'] else Wheel).cleanup()
 
     def update_vehicle_state_values(self, data):
-        self.vehicle_state[self.TORQUE_LEVEL] = data[self.TORQUE_LEVEL_INDEX]
-        self.vehicle_state[self.REVERSE] = self.get_from_status(data[self.STATUS_INDEX], 'reverse')
-        self.vehicle_state[self.DIRECTION_LEVEL] = data[self.DIRECTION_LEVEL_INDEX]
-        self.vehicle_state[self.DIRECTION] = self.get_from_status(data[self.STATUS_INDEX], 'direction')
+        status_bits = StatusBits(data[self.STATUS_INDEX])
 
-    def get_from_status(self, status_bits, status_type):
-        if status_type == 'reverse':
-            return ((status_bits & self.REVERSE_MASK) > 0)
-        elif status_type == 'direction':
-            if ((status_bits & self.DIRECTION_RIGHT_MASK) > 0):
-                return self.RIGHT
-            elif ((status_bits & self.DIRECTION_LEFT_MASK) > 0):
-                return self.LEFT
-            else:
-                return self.STRAIGHT
+        self.vehicle_state[self.TORQUE_LEVEL] = data[self.TORQUE_LEVEL_INDEX]
+        self.vehicle_state[self.REVERSE] = status_bits.reversed()
+        self.vehicle_state[self.DIRECTION_LEVEL] = data[self.DIRECTION_LEVEL_INDEX]
+
+        if status_bits.direction_right():
+            self.vehicle_state[self.DIRECTION] = self.RIGHT
+        elif status_bits.direction_left():
+            self.vehicle_state[self.DIRECTION] = self.LEFT
         else:
-            return 'Bad type'
+            self.vehicle_state[self.DIRECTION] = self.STRAIGHT
 
     def update_wheels_torque(self):
         if self.is_turning():
