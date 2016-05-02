@@ -1,3 +1,5 @@
+from servo_control import ServoControl
+
 class Steering:
     TANK_STRATEGY = 'tank'
     SERVO_STRATEGY = 'servo'
@@ -21,6 +23,9 @@ class Steering:
     def update(self, _1, _2):
         return True
 
+    def set_center(self):
+        return True
+
 class SteeringTank(Steering):
     def calculate_torque_level_turning_side(self, torque_level, direction_level):
         delta_percent = ((torque_level * direction_level) / 100)
@@ -28,10 +33,15 @@ class SteeringTank(Steering):
 
 class SteeringServo(Steering):
     def __init__(self):
-        self.steering_servo = ServoControl('steering')
+        self.steering_servo = ServoControl(ServoControl.STEERING_UNIT)
+
+    def set_center(self):
+        self.steering_servo.set_home()
 
     def update(self, direction_level, direction):
         if direction == self.LEFT:
-            self.steering_servo.turn_left(direction_level)
+            self.steering_servo.set_percent_before_home(direction_level)
         elif direction == self.RIGHT:
-            self.steering_servo.turn_right(direction_level)
+            self.steering_servo.set_percent_after_home(direction_level)
+        else:
+            self.set_center()

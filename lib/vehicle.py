@@ -50,6 +50,7 @@ class Vehicle:
     def stop_vehicle(self):
         self.left_wheel.stop()
         self.right_wheel.stop()
+        self.steering.set_center()
 
     def shutdown(self):
         self.stop_vehicle()

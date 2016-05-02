@@ -1,7 +1,7 @@
 class StatusBits:
-    REVERSE_MASK = 0b00000100
-    DIRECTION_RIGHT_MASK = 0b00000001
-    DIRECTION_LEFT_MASK = 0b00000010
+    DIRECTION_RIGHT_MASK = 1<<0
+    DIRECTION_LEFT_MASK = 1<<1
+    REVERSE_MASK = 1<<2
 
     def __init__(self, status_bits):
         self.status_bits = status_bits
