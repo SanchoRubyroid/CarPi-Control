@@ -39,7 +39,7 @@ class Vehicle:
     def update(self, data):
         self.update_vehicle_state_values(data)
 
-        if self.torque_level() == 0 && self.direction_level() == 0:
+        if self.torque_level() == 0 and self.direction_level() == 0:
             self.stop_vehicle()
         else:
             self.update_wheels_torque()
