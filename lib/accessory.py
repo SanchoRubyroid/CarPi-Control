@@ -12,6 +12,11 @@ class Accessory:
         LIGHTS: 29
     }
 
+    INITIAL_STATE = {
+        GLOBAL_ENABLE: GPIO.LOW,
+        LIGHTS: GPIO.HIGH
+    }
+
     def __init__(self, features):
         self.supported_features = features
 
@@ -19,8 +24,8 @@ class Accessory:
         GPIO.setmode(GPIO.BOARD)
 
         for feature in features:
-            GPIO.setup(PINS[feature], GPIO.OUT)
-            GPIO.output(PINS[feature], GPIO.HIGH)
+            GPIO.setup(self.PINS[feature], GPIO.OUT)
+            GPIO.output(self.PINS[feature], self.INITIAL_STATE[feature])
 
     def enable(self, feature):
         if feature in self.supported_features:
@@ -30,7 +35,7 @@ class Accessory:
         if feature in self.supported_features:
             self.__set_pin(self.PINS[feature], GPIO.HIGH)
 
-    def __set_pin(pin, value):
+    def __set_pin(self, pin, value):
         GPIO.output(pin, value)
 
 class DebugAccessory(Accessory):

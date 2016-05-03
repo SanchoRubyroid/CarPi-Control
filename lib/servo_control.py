@@ -15,8 +15,8 @@ class ServoControl:
     def __init__(self, servo_unit):
         self.channel = self.CHANNELS[servo_unit]
 
-        self.dead_point_delta = 50
-        self.home = 450
+        self.dead_point_delta = 90
+        self.home = 497
 
         self.pwm = PWM(0x40)
         self.pwm.setPWMFreq(60)

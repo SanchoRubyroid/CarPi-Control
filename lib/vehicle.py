@@ -21,7 +21,6 @@ class Vehicle:
 
         the_accessory_klass = (DebugAccessory if self.debug_mode else Accessory)
         self.accessory = the_accessory_klass(options['accessories'])
-        self.accessory.enable(Accessory.GLOBAL_ENABLE)
 
         self.steering = Steering.get(options['steering_strategy'])
 
@@ -35,12 +34,12 @@ class Vehicle:
             self.DIRECTION_LEVEL: 0,
             self.DIRECTION: self.steering.STRAIGHT
         }
-        self.vehicle_state = initial_vehicle_state        
+        self.vehicle_state = initial_vehicle_state
 
     def update(self, data):
         self.update_vehicle_state_values(data)
 
-        if self.torque_level() == 0:
+        if self.torque_level() == 0 && self.direction_level() == 0:
             self.stop_vehicle()
         else:
             self.update_wheels_torque()
