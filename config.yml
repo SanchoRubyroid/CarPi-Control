@@ -1,8 +1,7 @@
 debug_mode: true
-vehicle_name: 'shelby-gt100500'
+vehicle_name: 'Shelby-GT 100500'
 host: '159.203.81.18'
+# host: '127.0.0.1'
 port: 1337
 steering_strategy: 'tank'
-accessories:
-  - global-enable
-  - lights
+accessories: []

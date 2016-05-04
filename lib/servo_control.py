@@ -1,4 +1,8 @@
-from Sunfounder_PWM_Servo_Driver.Sunfounder_PWM_Servo_Driver import PWM
+try:
+    from Sunfounder_PWM_Servo_Driver.Sunfounder_PWM_Servo_Driver import PWM
+except ImportError:
+    print "ERROR: servo driver import failed. DEBUG_MODE only."
+
 import time
 
 class ServoControl:

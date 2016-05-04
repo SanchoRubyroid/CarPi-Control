@@ -2,6 +2,7 @@ try:
     import RPi.GPIO as GPIO
 except ImportError:
     print 'ERROR: RPi.GPIO import failed. DEBUG_MODE only.'
+    import debug_gpio as GPIO
 
 class Accessory:
     GLOBAL_ENABLE = 'global-enable'
