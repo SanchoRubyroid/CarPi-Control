@@ -10,7 +10,7 @@ class Wheel:
     }
 
     # PWM Frequece
-    PWM_FQ = 500
+    PWM_FQ = 40
 
     @classmethod
     def cleanup(cls):
