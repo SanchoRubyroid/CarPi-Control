@@ -33,8 +33,8 @@ class Listener:
             elif values[0] == 101:
                 self.shutdown()
                 break
-	    elif values[0] == 102:
-		self.tcp_cli_sock.send('pong')
+            elif values[0] == 102:
+                self.tcp_cli_sock.send('pong')
             else:
                 self.vehicle.update(values)
 
