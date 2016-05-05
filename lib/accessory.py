@@ -29,10 +29,10 @@ class Accessory:
             GPIO.output(self.PINS[feature], self.INITIAL_STATE[feature])
 
     def enable(self, feature):
-        self.__set_feature_if_supported(self, feature, GPIO.LOW)
+        self.__set_feature_if_supported(feature, GPIO.LOW)
 
     def disable(self, feature):
-        self.__set_feature_if_supported(self, feature, GPIO.HIGH)
+        self.__set_feature_if_supported(feature, GPIO.HIGH)
 
     def __set_feature_if_supported(self, feature, status):
         if feature in self.supported_features:
@@ -43,10 +43,10 @@ class DebugAccessory(Accessory):
         self.supported_features = features
 
     def enable(self, feature):
-        self.__set_feature_if_supported(self, feature, 'enabled')
+        self.__set_feature_if_supported(feature, 'enabled')
 
     def disable(self, feature):
-        self.__set_feature_if_supported(self, feature, 'disabled')
+        self.__set_feature_if_supported(feature, 'disabled')
 
     def __set_feature_if_supported(self, feature, status):
         if feature in self.supported_features:
