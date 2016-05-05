@@ -1,7 +1,7 @@
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    print 'ERROR: RPi.GPIO import failed. DEBUG_MODE only.'
+    print('ERROR: RPi.GPIO import failed. DEBUG_MODE only.')
 
 class Wheel:
     PINS = {
@@ -55,7 +55,7 @@ class Wheel:
 class DebugWheel:
     @classmethod
     def cleanup(cls):
-        print '[WHEEL] CLEANUP'
+        print('[WHEEL] CLEANUP')
 
     def __init__(self, options = {}):
         self.side = options['side'].upper().ljust(5)
@@ -70,4 +70,4 @@ class DebugWheel:
         self.say('RT: ' + str(reverse))
 
     def say(self, message):
-        print '[' + self.side + '] ' + message
+        print('[' + self.side + '] ' + message)

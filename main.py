@@ -16,7 +16,7 @@ class Listener:
 
     def listen(self):
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
-        print 'Connected'
+        print('Connected')
 
         self.tcp_cli_sock.send('vn:' + self.vehicle.name)
 
@@ -25,10 +25,10 @@ class Listener:
             values = struct.unpack('bbb', data)
 
             if self.config['debug_mode']:
-                print "DATA: " + str(values)
+                print("DATA: " + str(values))
 
             if not data:
-                print 'Server has gone away.'
+                print('Server has gone away.')
                 break
             elif values[0] == 101:
                 self.shutdown()
@@ -40,7 +40,7 @@ class Listener:
 
     def shutdown(self):
         self.vehicle.shutdown()
-        print 'Finished'
+        print('Finished')
 
 if __name__ == "__main__":
     try:

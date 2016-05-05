@@ -18,4 +18,4 @@ def output(cls, pin, status):
 
 @classmethod
 def __say(cls, pin, message):
-    print "[GPIO " + pin + cls.PINS[pin] + "] " + message
+    print("[GPIO " + pin + cls.PINS[pin] + "] " + message)

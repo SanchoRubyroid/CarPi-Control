@@ -1,7 +1,7 @@
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    print 'ERROR: RPi.GPIO import failed. DEBUG_MODE only.'
+    print('ERROR: RPi.GPIO import failed. DEBUG_MODE only.')
     import debug_gpio as GPIO
 
 class Accessory:
@@ -29,24 +29,25 @@ class Accessory:
             GPIO.output(self.PINS[feature], self.INITIAL_STATE[feature])
 
     def enable(self, feature):
-        if feature in self.supported_features:
-            self.__set_pin(self.PINS[feature], GPIO.LOW)
+        self.__set_feature_if_supported(self, feature, GPIO.LOW)
 
     def disable(self, feature):
-        if feature in self.supported_features:
-            self.__set_pin(self.PINS[feature], GPIO.HIGH)
+        self.__set_feature_if_supported(self, feature, GPIO.HIGH)
 
-    def __set_pin(self, pin, value):
-        GPIO.output(pin, value)
+    def __set_feature_if_supported(self, feature, status):
+        if feature in self.supported_features:
+            GPIO.output(self.PINS[feature], status)
 
 class DebugAccessory(Accessory):
     def __init__(self, features):
         self.supported_features = features
 
     def enable(self, feature):
-        if feature in self.supported_features:
-            print 'Accessory ' + feature + ' is enabled'
+        self.__set_feature_if_supported(self, feature, 'enabled')
 
     def disable(self, feature):
+        self.__set_feature_if_supported(self, feature, 'disabled')
+
+    def __set_feature_if_supported(self, feature, status):
         if feature in self.supported_features:
-            print 'Accessory ' + feature + ' is disabled'
+            print('Accessory ' + feature + ' is ' + status)
