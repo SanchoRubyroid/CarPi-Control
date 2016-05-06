@@ -4,6 +4,7 @@ import yaml
 import json
 import socket
 import struct
+import datetime
 
 class Listener:
     BUFSIZ = 3
@@ -44,6 +45,7 @@ class Listener:
 
 if __name__ == "__main__":
     try:
+        print("Started at " + str(datetime.datetime.now()))
         listener = Listener()
         listener.listen()
     except KeyboardInterrupt:
