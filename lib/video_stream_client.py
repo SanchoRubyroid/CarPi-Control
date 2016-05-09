@@ -6,19 +6,29 @@ import time
 import picamera
 
 class VideoStreamClient(threading.Thread):
-    def __init__(self):
+    def __init__(self, host_port):
         threading.Thread.__init__(self)
 
+        self.camera = picamera.PiCamera()
+
         self.connection = socket.socket()
-        self.connection.connect(('192.168.0.100', 1338))
+        self.connection.connect(host_port)
 
         self.camera.resolution = (240, 180)
         self.camera.vflip = True
         # Start a preview and let the camera warm up for 2 seconds
+
+        self.stream = io.BytesIO()
+
+        self.stop_capture = False
+
+    def enable_camera(self):
         self.camera.start_preview()
         time.sleep(2)
 
-        self.stream = io.BytesIO()
+    def shutdown(self):
+        self.camera.stop_preview()
+        self.stop_capture = True
 
     def run(self):
         try:
@@ -36,7 +46,8 @@ class VideoStreamClient(threading.Thread):
                 self.stream.seek(0)
                 self.stream.truncate()
                 recv_len = struct.unpack('<L', self.connection.recv(struct.calcsize('<L')))[0]
-                if recv_len == 0xFFFFFFFF:
+                if recv_len == 0xFFFFFFFF || self.stop_capture:
+                    self.stop_capture = False
                     break;
                 #print("RECV LEN: " + str(recv_len))
                 time.sleep(0.1)

@@ -1,5 +1,5 @@
 from lib.vehicle import Vehicle
-from lib.video_stream_client import VSC
+from lib.video_stream_client import VideoStreamClient
 
 import yaml
 import json
@@ -15,6 +15,8 @@ class Listener:
 
         self.vehicle = Vehicle(self.config)
         self.tcp_cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1))
 
     def listen(self):
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
@@ -38,15 +40,14 @@ class Listener:
             elif values[0] == 102:
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103:
-                stream = VSC()
-                stream.start()
-            elif values[0] == 104:
-                # Stop streaming
+                self.stream.enable_camera()
+                self.stream.start()
             else:
                 self.vehicle.update(values)
 
     def shutdown(self):
         self.vehicle.shutdown()
+        self.stream.shutdown()
         print('Finished')
 
 if __name__ == "__main__":
