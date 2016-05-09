@@ -1,4 +1,5 @@
 from lib.vehicle import Vehicle
+from lib.video_stream_client import VSC
 
 import yaml
 import json
@@ -36,6 +37,11 @@ class Listener:
                 break
             elif values[0] == 102:
                 self.tcp_cli_sock.send('pong')
+            elif values[0] == 103:
+                stream = VSC()
+                stream.start()
+            elif values[0] == 104:
+                # Stop streaming
             else:
                 self.vehicle.update(values)
 
