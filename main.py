@@ -16,8 +16,6 @@ class Listener:
         self.vehicle = Vehicle(self.config)
         self.tcp_cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1))
-
     def listen(self):
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
         print('Connected')
@@ -40,14 +38,16 @@ class Listener:
             elif values[0] == 102:
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103:
-                self.stream.enable_camera()
+                self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1), self.vehicle.name)
                 self.stream.start()
             else:
                 self.vehicle.update(values)
 
     def shutdown(self):
         self.vehicle.shutdown()
-        self.stream.shutdown()
+        if self.stream:
+            self.stream.shutdown()
+            self.stream.join()
         print('Finished')
 
 if __name__ == "__main__":
