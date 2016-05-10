@@ -18,6 +18,7 @@ class Vehicle:
 
         self.name = options['vehicle_name']
         self.debug_mode = options['debug_mode']
+        self.turning_point = float(options['vehicle_turning_point'])
 
         the_accessory_klass = (DebugAccessory if self.debug_mode else Accessory)
         self.accessory = the_accessory_klass(options['accessories'])
@@ -71,22 +72,29 @@ class Vehicle:
             self.vehicle_state[self.DIRECTION] = self.steering.STRAIGHT
 
     def update_wheels_torque(self):
+        left_torque = right_torque = self.torque_level()
+
         if self.is_turning():
-            torque_level_turning_side = self.steering.calculate_torque_level_turning_side(self.torque_level(), self.direction_level())
+            torque_level_turning_side = self.steering.calculate_torque_level_turning_side(self.torque_level(), self.direction_level(), self.turning_point)
 
         if self.direction() == self.steering.LEFT:
-            self.left_wheel.set_level(torque_level_turning_side)
-            self.right_wheel.set_level(self.torque_level())
+            left_torque = torque_level_turning_side
         elif self.direction() == self.steering.RIGHT:
-            self.left_wheel.set_level(self.torque_level())
-            self.right_wheel.set_level(torque_level_turning_side)
-        else:
-            self.left_wheel.set_level(self.torque_level())
-            self.right_wheel.set_level(self.torque_level())
+            right_torque = torque_level_turning_side
+
+        self.left_wheel.set_level(left_torque)
+        self.right_wheel.set_level(right_torque)
 
     def update_wheels_rotation(self):
-        self.left_wheel.set_rotation(self.reverse())
-        self.right_wheel.set_rotation(self.reverse())
+        left_reverse = right_reverse = self.reverse()
+
+        if self.direction() == self.steering.LEFT and self.direction_level() > self.turning_point:
+            left_reverse = not self.reverse()
+        elif self.direction() == self.steering.RIGHT and self.direction_level() > self.turning_point:
+            right_reverse = not self.reverse()
+
+        self.left_wheel.set_rotation(left_reverse)
+        self.right_wheel.set_rotation(right_reverse)
 
     def update_steering(self):
         self.steering.update(self.direction_level(), self.direction())
