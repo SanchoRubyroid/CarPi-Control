@@ -18,7 +18,7 @@ class Vehicle:
 
         self.name = options['vehicle_name']
         self.debug_mode = options['debug_mode']
-        self.turning_point = float(options['vehicle_turning_point'])
+        self.set_turning_apex(float(options['vehicle_turning_apex']))
 
         the_accessory_klass = (DebugAccessory if self.debug_mode else Accessory)
         self.accessory = the_accessory_klass(options['accessories'])
@@ -75,7 +75,7 @@ class Vehicle:
         left_torque = right_torque = self.torque_level()
 
         if self.is_turning():
-            torque_level_turning_side = self.steering.calculate_torque_level_turning_side(self.torque_level(), self.direction_level(), self.turning_point)
+            torque_level_turning_side = self.steering.calculate_torque_level_turning_side(self.torque_level(), self.direction_level(), self.turning_apex)
 
         if self.direction() == self.steering.LEFT:
             left_torque = torque_level_turning_side
@@ -88,9 +88,9 @@ class Vehicle:
     def update_wheels_rotation(self):
         left_reverse = right_reverse = self.reverse()
 
-        if self.direction() == self.steering.LEFT and self.direction_level() > self.turning_point:
+        if self.direction() == self.steering.LEFT and self.direction_level() > self.turning_apex:
             left_reverse = not self.reverse()
-        elif self.direction() == self.steering.RIGHT and self.direction_level() > self.turning_point:
+        elif self.direction() == self.steering.RIGHT and self.direction_level() > self.turning_apex:
             right_reverse = not self.reverse()
 
         self.left_wheel.set_rotation(left_reverse)
@@ -98,6 +98,11 @@ class Vehicle:
 
     def update_steering(self):
         self.steering.update(self.direction_level(), self.direction())
+
+    def set_turning_apex(self, turning_apex):
+        if turning_apex < 50 or turning_apex > 100:
+            raise ValueError('Turning apex must be in range 50..100')
+        self.turning_apex = turning_apex
 
     def is_turning(self):
         return self.direction() in [self.steering.LEFT, self.steering.RIGHT]

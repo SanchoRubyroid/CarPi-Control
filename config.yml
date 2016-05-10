@@ -1,6 +1,6 @@
 debug_mode: false
 vehicle_name: 'Shelby-GT 100500'
-vehicle_turning_point: 75
+vehicle_turning_apex: 75
 host: '159.203.81.18'
 #host: '192.168.0.100'
 port: 1337

@@ -27,11 +27,11 @@ class Steering:
         return True
 
 class SteeringTank(Steering):
-    def calculate_torque_level_turning_side(self, torque_level, direction_level, turning_point):
-        if direction_level > turning_point:
-            direction_level = turning_point*2 - direction_level
+    def calculate_torque_level_turning_side(self, torque_level, direction_level, turning_apex):
+        if direction_level > turning_apex:
+            direction_level = turning_apex*2 - direction_level
 
-        direction_level *= 100/turning_point
+        direction_level *= 100/turning_apex
 
         delta_percent = ((torque_level * direction_level) / 100)
         return torque_level - delta_percent
