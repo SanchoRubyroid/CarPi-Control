@@ -32,35 +32,32 @@ class Listener:
 
         while True:
             data = self.tcp_cli_sock.recv(self.BUFFER_SIZE)
-            if len(data) == 0: continue # skip blank packet
+            #if len(data) == 0: continue # skip blank packet
 
-            try:
-                values = struct.unpack('bbb', data)
+            values = struct.unpack('bbb', data)
 
-                if self.config['debug_mode']:
-                    print("DATA: " + str(values))
+            if self.config['debug_mode']:
+                print("DATA: " + str(values))
 
-                if not data:
-                    print('Server has gone away.')
-                    break
-                if values[0] <= 100:
-                    self.vehicle.update(values)
-                elif values[0] == 101:
-                    self.shutdown()
-                    break
-                elif values[0] == 102:
-                    self.tcp_cli_sock.send('pong')
-                elif values[0] == 103:
-                    if self.camera:
-                        self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1), self.vehicle.name, self.camera)
-                        self.stream.start()
-                elif values[0] == 105:
-                    self.camera_shutdown()
-                elif values[0] == 106:
-                    self.vehicle.set_turning_apex(values[1])
-                else:
-                    self.say_bad_packet(data)
-            except struct.error:
+            if not data:
+                print('Server has gone away.')
+                break
+            if values[0] <= 100:
+                self.vehicle.update(values)
+            elif values[0] == 101:
+                self.shutdown()
+                break
+            elif values[0] == 102:
+                self.tcp_cli_sock.send('pong')
+            elif values[0] == 103:
+                if self.camera:
+                    self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1), self.vehicle.name, self.camera)
+                    self.stream.start()
+            elif values[0] == 105:
+                self.camera_shutdown()
+            elif values[0] == 106:
+                self.vehicle.set_turning_apex(values[1])
+            else:
                 self.say_bad_packet(data)
 
     def say_bad_packet(self, data):
