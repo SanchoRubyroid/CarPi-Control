@@ -3,17 +3,16 @@ import io
 import socket
 import struct
 import time
-import picamera
 
 class VideoStreamClient(threading.Thread):
-    def __init__(self, host_port, vehicle_name):
+    def __init__(self, host_port, vehicle_name, camera):
         super(VideoStreamClient, self).__init__()
         self._stop = threading.Event()
 
         self.host_port = host_port
         self.vehicle_name = vehicle_name
 
-        self.camera = picamera.PiCamera()
+        self.camera = camera
         self.camera.resolution = (240, 180)
         self.camera.vflip = True
         self.camera.hflip = True

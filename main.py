@@ -6,6 +6,7 @@ import json
 import socket
 import struct
 import datetime
+import picamera
 
 class Listener:
     BUFSIZ = 3
@@ -15,6 +16,7 @@ class Listener:
 
         self.vehicle = Vehicle(self.config)
         self.tcp_cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.camera = picamera.PiCamera()
 
     def listen(self):
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
@@ -38,16 +40,19 @@ class Listener:
             elif values[0] == 102:
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103:
-                self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1), self.vehicle.name)
+                self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1), self.vehicle.name, self.camera)
                 self.stream.start()
             else:
                 self.vehicle.update(values)
 
     def shutdown(self):
         self.vehicle.shutdown()
-        if self.stream:
-            self.stream.shutdown()
-            self.stream.join()
+        try:
+            if self.stream:
+                self.stream.shutdown()
+                self.stream.join()
+        except AttributeError:
+            pass # stream was not initialized so no need to shutdown
         print('Finished')
 
 if __name__ == "__main__":
