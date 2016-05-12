@@ -24,7 +24,7 @@ class VideoStreamClient(threading.Thread):
         self.stop_capture = False
 
         self.connection = socket.socket()
-        self.connection.connect((options['host'], int(options['host'])+1))
+        self.connection.connect((options['host'], int(options['port'])+1))
 
         self.connection.send('vn:' + options['vehicle_name'])
 
