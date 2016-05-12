@@ -1,8 +1,16 @@
 debug_mode: false
+
+# Vehicle settings
 vehicle_name: 'Shelby-GT 100500'
 vehicle_turning_apex: 75
-host: '159.203.81.18'
-#host: '192.168.0.100'
-port: 1337
 steering_strategy: 'tank'
 accessories: []
+
+# Video Settings
+ratio_factor: 20
+
+# Connection settings
+host: '159.203.81.18'
+#host: '10.4.11.33'
+#host: '127.0.0.1'
+port: 1337

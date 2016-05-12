@@ -5,15 +5,17 @@ import struct
 import time
 
 class VideoStreamClient(threading.Thread):
-    def __init__(self, host_port, vehicle_name, camera):
+    RATIO_VERTICAL = 16
+    RATIO_HORIZONTAL = 9
+
+    def __init__(self, options):
         super(VideoStreamClient, self).__init__()
         self._stop = threading.Event()
 
-        self.host_port = host_port
-        self.vehicle_name = vehicle_name
+        ratio_factor = int(options['ratio_factor'])
 
-        self.camera = camera
-        self.camera.resolution = (240, 180)
+        self.camera = options['camera']
+        self.camera.resolution = (ratio_factor * self.RATIO_VERTICAL, ratio_factor * self.RATIO_HORIZONTAL)
         self.camera.vflip = True
         self.camera.hflip = True
 
@@ -22,9 +24,9 @@ class VideoStreamClient(threading.Thread):
         self.stop_capture = False
 
         self.connection = socket.socket()
-        self.connection.connect(self.host_port)
+        self.connection.connect((options['host'], int(options['host'])+1))
 
-        self.connection.send('vn:' + self.vehicle_name)
+        self.connection.send('vn:' + options['vehicle_name'])
 
     def shutdown(self):
         self.camera.stop_preview()
@@ -54,6 +56,6 @@ class VideoStreamClient(threading.Thread):
                     break;
 
                 # Sleep before the next shot
-                time.sleep(0.1)
+                time.sleep(0.07)
         finally:
             self.connection.close()

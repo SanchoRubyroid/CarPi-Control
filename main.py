@@ -22,7 +22,7 @@ class Listener:
         self.vehicle = Vehicle(self.config)
         self.tcp_cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.camera = (picamera.PiCamera() if picamera else False)
+        self.config['camera'] = (picamera.PiCamera() if picamera else False)
 
     def listen(self):
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
@@ -50,8 +50,8 @@ class Listener:
             elif values[0] == 102:
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103:
-                if self.camera:
-                    self.stream = VideoStreamClient((self.config['host'], int(self.config['port'])+1), self.vehicle.name, self.camera)
+                if self.config['camera']:
+                    self.stream = VideoStreamClient(self.config)
                     self.stream.start()
             elif values[0] == 105:
                 self.camera_shutdown()
