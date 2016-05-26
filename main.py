@@ -1,17 +1,11 @@
 from lib.vehicle import Vehicle
-from lib.video_stream_client import VideoStreamClient
+from lib.ffmpeg_streamer import FFMPEGStramer
 
 import yaml
-import json
 import socket
 import struct
 import datetime
 import binascii
-
-try:
-    import picamera
-except ImportError:
-    picamera = False
 
 class Listener:
     BUFFER_SIZE = 3
@@ -22,8 +16,6 @@ class Listener:
         self.vehicle = Vehicle(self.config)
         self.tcp_cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.config['camera'] = (picamera.PiCamera() if picamera else False)
-
     def listen(self):
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
         print('Connected')
@@ -32,7 +24,6 @@ class Listener:
 
         while True:
             data = self.tcp_cli_sock.recv(self.BUFFER_SIZE)
-            #if len(data) == 0: continue # skip blank packet
 
             values = struct.unpack('bbb', data)
 
@@ -42,20 +33,22 @@ class Listener:
             if not data:
                 print('Server has gone away.')
                 break
-            if values[0] <= 100:
+            if values[0] <= 100: # Regular control values
                 self.vehicle.update(values)
-            elif values[0] == 101:
+            elif values[0] == 101: # Shutdown command
                 self.shutdown()
                 break
-            elif values[0] == 102:
+            elif values[0] == 102: # Shutdown command
                 self.tcp_cli_sock.send('pong')
-            elif values[0] == 103:
-                if self.config['camera']:
-                    self.stream = VideoStreamClient(self.config)
-                    self.stream.start()
-            elif values[0] == 105:
-                self.camera_shutdown()
-            elif values[0] == 106:
+            elif values[0] == 103: # Start real-time video streaming
+                self.stream_shutdown()
+                self.stream = FFMPEGStramer(self.config, {
+                    'streaming-port-number': values[1],
+                    'ratio-factor': values[2] })
+                self.stream.stream()
+            elif values[0] == 105: # Stop real-time video streaming
+                self.stream_shutdown()
+            elif values[0] == 106: # Set vehicle turning apex
                 self.vehicle.set_turning_apex(values[1])
             else:
                 self.say_bad_packet(data)
@@ -63,17 +56,16 @@ class Listener:
     def say_bad_packet(self, data):
         print('Bad incoming packet: ' + binascii.hexlify(data))
 
-    def camera_shutdown(self):
+    def stream_shutdown(self):
         try:
-            self.stream.shutdown()
-            self.stream.join()
+            self.stream.close()
             print("Video streaming stopped")
         except AttributeError:
             pass # stream was not initialized so no need to shutdown
 
     def shutdown(self):
         self.vehicle.shutdown()
-        self.camera_shutdown()
+        self.stream_shutdown()
         print('Finished')
 
 if __name__ == "__main__":

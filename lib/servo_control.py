@@ -16,11 +16,19 @@ class ServoControl:
         CAMERA_HORIZONTAL: 15
     }
 
+    DEAD_POINTS_DETLA = {
+        STEERING_UNIT: 90
+    }
+
+    HOME_VALUES = {
+        STEERING_UNIT: 497
+    }
+
     def __init__(self, servo_unit):
         self.channel = self.CHANNELS[servo_unit]
 
-        self.dead_point_delta = 90
-        self.home = 497
+        self.dead_point_delta = self.DEAD_POINTS_DETLA[servo_unit]
+        self.home = self.HOME_VALUES[servo_unit]
 
         self.pwm = PWM(0x40)
         self.pwm.setPWMFreq(60)

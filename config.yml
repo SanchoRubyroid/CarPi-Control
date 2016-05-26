@@ -7,10 +7,12 @@ steering_strategy: 'tank'
 accessories: []
 
 # Video Settings
-ratio_factor: 20
+ffmpeg_command: '/usr/local/bin/ffmpeg'
+ffmpeg_input_format: 'avfoundation'
+ffmpeg_input_device: '0'
 
 # Connection settings
 host: '159.203.81.18'
-#host: '10.4.11.33'
-#host: '127.0.0.1'
+#host: '10.4.100.59'
+#host: '192.168.0.100'
 port: 1337
