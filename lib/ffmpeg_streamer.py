@@ -34,8 +34,6 @@ class FFMPEGStramer():
         params.append('800k')
         params.append('http://'+ self.config['host'] +':'+ str(self.streaming_port) +'/'+ str(width) +'/'+ str(height) +'/')
 
-        print(">>>>>> PARAMS: "+str(params))
-
         self.subprocess_proc = subprocess.Popen(params)
 
     def close(self):
