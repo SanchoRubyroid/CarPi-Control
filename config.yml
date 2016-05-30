@@ -7,9 +7,16 @@ steering_strategy: 'tank'
 accessories: []
 
 # Video Settings
-ffmpeg_command: '/usr/local/bin/ffmpeg'
-ffmpeg_input_format: 'avfoundation'
-ffmpeg_input_device: '0'
+ffmpeg:
+  command: '/usr/local/bin/ffmpeg'
+  input_format: 'avfoundation'
+  input_device: '0'
+  bitrate: '800k'
+  fps: 23
+ratio:
+  factor: 1
+  horizontal: 320
+  vertical: 240
 
 # Connection settings
 host: '159.203.81.18'

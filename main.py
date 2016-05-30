@@ -6,6 +6,7 @@ import socket
 import struct
 import datetime
 import binascii
+import json
 
 class Listener:
     BUFFER_SIZE = 3
@@ -20,7 +21,7 @@ class Listener:
         self.tcp_cli_sock.connect((self.config['host'], self.config['port']))
         print('Connected')
 
-        self.tcp_cli_sock.send('vn:' + self.vehicle.name)
+        self.tcp_cli_sock.send(json.dumps(self.config))
 
         while True:
             data = self.tcp_cli_sock.recv(self.BUFFER_SIZE)
@@ -42,9 +43,7 @@ class Listener:
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103: # Start real-time video streaming
                 self.stream_shutdown()
-                self.stream = FFMPEGStramer(self.config, {
-                    'streaming-port-number': values[1],
-                    'ratio-factor': values[2] })
+                self.stream = FFMPEGStramer(self.config, { 'streaming-port-number': values[1] })
                 self.stream.stream()
             elif values[0] == 105: # Stop real-time video streaming
                 self.stream_shutdown()
