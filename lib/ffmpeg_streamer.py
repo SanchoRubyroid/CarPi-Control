@@ -28,6 +28,9 @@ class FFMPEGStramer():
         params.append(self.config['ffmpeg']['bitrate'])
         params.append('-r')
         params.append(str(self.config['ffmpeg']['fps']))
+        if self.config['ffmpeg']['rotate_180']:
+            params.append('-vf')
+            params.append('transpose=2,transpose=2')
         params.append('http://'+ self.config['host'] +':'+ str(self.streaming_port) +'/')
 
         self.subprocess_proc = subprocess.Popen(params)

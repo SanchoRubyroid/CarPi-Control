@@ -13,6 +13,7 @@ ffmpeg:
   input_device: '0'
   bitrate: '800k'
   fps: 23
+  rotate_180: false
 ratio:
   factor: 1
   horizontal: 320
