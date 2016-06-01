@@ -42,13 +42,25 @@ class Listener:
             elif values[0] == 102: # Shutdown command
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103: # Start real-time video streaming
+                streaming_port = struct.unpack('<L', self.tcp_cli_sock.recv(struct.calcsize('<L')))[0]
                 self.stream_shutdown()
-                self.stream = FFMPEGStramer(self.config, { 'streaming-port-number': values[1] })
+                self.stream = FFMPEGStramer(self.config, streaming_port)
                 self.stream.stream()
             elif values[0] == 105: # Stop real-time video streaming
                 self.stream_shutdown()
             elif values[0] == 106: # Set vehicle turning apex
                 self.vehicle.set_turning_apex(values[1])
+            elif values[0] == 107: # Set Video Quality
+                self.config['ratio']['horizontal'] = 16
+                self.config['ratio']['vertical'] = 12
+                if values[1] == 2:
+                    self.config['ratio']['factor'] = 40
+                elif values[1] == 0:
+                    self.config['ratio']['factor'] = 10
+                else:
+                    self.config['ratio']['factor'] = 20
+
+                self.tcp_cli_sock.send(json.dumps(self.config))
             else:
                 self.say_bad_packet(data)
 

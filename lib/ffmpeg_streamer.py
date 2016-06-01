@@ -1,10 +1,8 @@
 import subprocess
 
 class FFMPEGStramer():
-    STREAM_PORTS_OFFSET = 20256
-
-    def __init__(self, config, options = {}):
-        self.streaming_port = self.STREAM_PORTS_OFFSET + int(options['streaming-port-number'])
+    def __init__(self, config, streaming_port):
+        self.streaming_port = streaming_port
 
         self.config = config
         self.closed = False
@@ -15,10 +13,13 @@ class FFMPEGStramer():
 
         params = [self.config['ffmpeg']['command']]
         # INPUT
-        params.append('-s')
-        params.append(str(width) + 'x' + str(height))
         params.append('-f')
         params.append(self.config['ffmpeg']['input_format'])
+        if 'fps' in self.config['ffmpeg']:
+            params.append('-framerate')
+            params.append(str(self.config['ffmpeg']['fps']))
+        params.append('-video_size')
+        params.append(str(width) + 'x' + str(height))
         params.append('-i')
         params.append(self.config['ffmpeg']['input_device'])
         # OUTPUT
@@ -26,11 +27,12 @@ class FFMPEGStramer():
         params.append('mpeg1video')
         params.append('-b')
         params.append(self.config['ffmpeg']['bitrate'])
-        params.append('-r')
-        params.append(str(self.config['ffmpeg']['fps']))
         if self.config['ffmpeg']['rotate_180']:
             params.append('-vf')
             params.append('transpose=2,transpose=2')
+        if 'loglevel' in self.config['ffmpeg']:
+            params.append('-loglevel')
+            params.append(self.config['ffmpeg']['loglevel'])
         params.append('http://'+ self.config['host'] +':'+ str(self.streaming_port) +'/')
 
         self.subprocess_proc = subprocess.Popen(params)

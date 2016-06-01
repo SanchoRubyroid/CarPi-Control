@@ -12,8 +12,9 @@ ffmpeg:
   input_format: 'avfoundation'
   input_device: '0'
   bitrate: '800k'
-  fps: 23
+  #fps: 23
   rotate_180: false
+  loglevel: 'panic'
 ratio:
   factor: 1
   horizontal: 320
@@ -21,6 +22,6 @@ ratio:
 
 # Connection settings
 host: '159.203.81.18'
-#host: '10.4.100.59'
+#host: '10.4.11.5'
 #host: '192.168.0.100'
 port: 1337
