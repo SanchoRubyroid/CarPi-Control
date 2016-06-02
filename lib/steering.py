@@ -17,7 +17,7 @@ class Steering:
         else:
             raise ValueError('Unrecognized steering strategy.')
 
-    def calculate_torque_level_turning_side(self, torque_level, _1):
+    def calculate_torque_level_turning_side(self, torque_level, _1, _2):
         return torque_level
 
     def update(self, _1, _2):
@@ -26,7 +26,13 @@ class Steering:
     def set_center(self):
         return True
 
+    def is_tank(self):
+        return self.strategy == self.TANK_STRATEGY
+
 class SteeringTank(Steering):
+    def __init__(self):
+        self.strategy = self.TANK_STRATEGY
+
     def calculate_torque_level_turning_side(self, torque_level, direction_level, turning_apex):
         if direction_level > turning_apex:
             direction_level = turning_apex*2 - direction_level
@@ -38,6 +44,7 @@ class SteeringTank(Steering):
 
 class SteeringServo(Steering):
     def __init__(self):
+        self.strategy = SERVO_STRATEGY
         self.steering_servo = ServoControl(ServoControl.STEERING_UNIT)
 
     def set_center(self):

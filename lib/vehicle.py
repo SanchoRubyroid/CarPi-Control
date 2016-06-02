@@ -88,10 +88,11 @@ class Vehicle:
     def update_wheels_rotation(self):
         left_reverse = right_reverse = self.reverse()
 
-        if self.direction() == self.steering.LEFT and self.direction_level() > self.turning_apex:
-            left_reverse = not self.reverse()
-        elif self.direction() == self.steering.RIGHT and self.direction_level() > self.turning_apex:
-            right_reverse = not self.reverse()
+        if self.steering.is_tank():
+            if self.direction() == self.steering.LEFT and self.direction_level() > self.turning_apex:
+                left_reverse = not self.reverse()
+            elif self.direction() == self.steering.RIGHT and self.direction_level() > self.turning_apex:
+                right_reverse = not self.reverse()
 
         self.left_wheel.set_rotation(left_reverse)
         self.right_wheel.set_rotation(right_reverse)

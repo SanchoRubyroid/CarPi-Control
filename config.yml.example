@@ -4,15 +4,18 @@ debug_mode: false
 vehicle_name: 'Shelby-GT 100500'
 vehicle_turning_apex: 75
 steering_strategy: 'tank'
-accessories: []
+accessories:
+  - lights
+  - global-enable
 
 # Video Settings
 ffmpeg:
   command: '/usr/local/bin/ffmpeg'
   input_format: 'avfoundation'
   input_device: '0'
+  secondary_input_device: '3'
   bitrate: '800k'
-  #fps: 23
+  fps: 23
   rotate_180: false
   loglevel: 'panic'
 ratio:
@@ -22,6 +25,4 @@ ratio:
 
 # Connection settings
 host: '159.203.81.18'
-#host: '10.4.11.5'
-#host: '192.168.0.100'
 port: 1337

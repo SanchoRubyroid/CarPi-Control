@@ -26,6 +26,7 @@ class Listener:
         while True:
             data = self.tcp_cli_sock.recv(self.BUFFER_SIZE)
 
+            # Reveive 3 bytes of data
             values = struct.unpack('bbb', data)
 
             if self.config['debug_mode']:
@@ -39,7 +40,7 @@ class Listener:
             elif values[0] == 101: # Shutdown command
                 self.shutdown()
                 break
-            elif values[0] == 102: # Shutdown command
+            elif values[0] == 102: # Ping
                 self.tcp_cli_sock.send('pong')
             elif values[0] == 103: # Start real-time video streaming
                 streaming_port = struct.unpack('<L', self.tcp_cli_sock.recv(struct.calcsize('<L')))[0]
