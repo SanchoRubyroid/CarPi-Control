@@ -57,6 +57,9 @@ class Vehicle:
         self.accessory.disable(Accessory.GLOBAL_ENABLE)
         (DebugWheel if self.debug_mode else Wheel).cleanup()
 
+    def toggle_lights(self):
+        self.accessory.toggle(Accessory.LIGHTS)
+
     def update_vehicle_state_values(self, data):
         status_bits = StatusBits(data[self.STATUS_INDEX])
 

@@ -1,3 +1,4 @@
+import copy
 try:
     import RPi.GPIO as GPIO
 except ImportError:
@@ -19,6 +20,8 @@ class Accessory:
     }
 
     def __init__(self, features):
+        self.pins_statuses = copy.copy(self.INITIAL_STATE)
+
         self.supported_features = features
 
         # Numbers GPIOs by physical location
@@ -26,7 +29,7 @@ class Accessory:
 
         for feature in features:
             GPIO.setup(self.PINS[feature], GPIO.OUT)
-            GPIO.output(self.PINS[feature], self.INITIAL_STATE[feature])
+            GPIO.output(self.PINS[feature], self.pins_statuses[feature])
 
     def enable(self, feature):
         self.__set_feature_if_supported(feature, GPIO.LOW)
@@ -34,8 +37,15 @@ class Accessory:
     def disable(self, feature):
         self.__set_feature_if_supported(feature, GPIO.HIGH)
 
+    def toggle(self, feature):
+        if self.pins_statuses[feature] == GPIO.HIGH:
+            self.__set_feature_if_supported(feature, GPIO.LOW)
+        else
+            self.__set_feature_if_supported(feature, GPIO.HIGH)
+
     def __set_feature_if_supported(self, feature, status):
         if feature in self.supported_features:
+            self.pins_statuses[feature] = status
             GPIO.output(self.PINS[feature], status)
 
 class DebugAccessory(Accessory):

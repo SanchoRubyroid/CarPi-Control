@@ -52,6 +52,7 @@ class Listener:
             elif values[0] == 106: # Set vehicle turning apex
                 self.vehicle.set_turning_apex(values[1])
             elif values[0] == 107: # Set Video Quality
+                # TODO REFACTOR!!!
                 self.config['ratio']['horizontal'] = 16
                 self.config['ratio']['vertical'] = 12
                 if values[1] == 2:
@@ -62,6 +63,8 @@ class Listener:
                     self.config['ratio']['factor'] = 20
 
                 self.tcp_cli_sock.send(json.dumps(self.config))
+            elif values[0] == 108: # Toggle lights
+                self.vehicle.toggle_lights()
             else:
                 self.say_bad_packet(data)
 
