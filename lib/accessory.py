@@ -39,7 +39,7 @@ class Accessory:
     def toggle(self, feature):
         if self.pins_statuses[feature] == GPIO.HIGH:
             self.__set_feature_if_supported(feature, GPIO.LOW)
-        else
+        else:
             self.__set_feature_if_supported(feature, GPIO.HIGH)
 
     def __set_feature_if_supported(self, feature, status):
