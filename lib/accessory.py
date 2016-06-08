@@ -20,9 +20,8 @@ class Accessory:
     }
 
     def __init__(self, features):
-        self.pins_statuses = copy.copy(self.INITIAL_STATE)
-
         self.supported_features = features
+        self.pins_statuses = copy.copy(self.INITIAL_STATE)
 
         # Numbers GPIOs by physical location
         GPIO.setmode(GPIO.BOARD)
